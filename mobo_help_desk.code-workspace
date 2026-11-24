@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../mobo"
+		},
+		{
+			"path": "../mobo_messenger"
+		},
+		{
+			"path": "../mobo_crm"
+		}
+	],
+	"settings": {}
+}
