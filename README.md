@@ -46,9 +46,6 @@ performance insights, and seamless offline synchronization.
   <img src="assets/images/screenshots/tickets.png" width="200" style="margin:8px;" />
   <img src="assets/images/screenshots/teams.png" width="200" style="margin:8px;" />
   <img src="assets/images/screenshots/sla_policies.png" width="200" style="margin:8px;" />
-  <img src="assets/images/screenshots/ticket_details.png" width="200" style="margin:8px;" />
-  <img src="assets/images/screenshots/team_details.png" width="200" style="margin:8px;" />
-  <img src="assets/images/screenshots/sla_policy_details.png" width="200" style="margin:8px;" />
 </div>
 
 ## Technology Stack
@@ -103,5 +100,5 @@ their respective licenses.
 
 **Team Mobo at Cybrosys Technologies**
 
-- Email: [cybroplay@gmail.com](mailto:cybroplay@gmail.com)
-- Website: [cybrosys.com](https://www.cybrosys.com)
+- Email: [mobo@cybrosys.com](mailto:mobo@cybrosys.com)
+- Website: [cybrosys.com/mobo](https://www.cybrosys.com/mobo/)
