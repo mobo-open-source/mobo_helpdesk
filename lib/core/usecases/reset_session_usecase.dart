@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../session/company_session_manager.dart';
 import '../storage/storage_service.dart';
 import '../utils/odoo_field_resolver.dart';
+import '../storage/session_token_store.dart';
 
 /// UseCase responsible for resetting the user's session while preserving essential app settings.
 ///
@@ -42,6 +43,7 @@ class ResetSessionUseCase {
     await prefs.setBool('biometricEnabled', biometricEnabled);
 
     await StorageService().clearAccounts();
+    await SessionTokenStore.clearAll();
 
     await CompanySessionManager.clearSessionCache();
     OdooFieldResolver.clearCache();

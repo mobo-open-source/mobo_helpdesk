@@ -5,7 +5,7 @@
     <application
         android:label="mobo Helpdesk"
         android:name="${applicationName}"
-        android:usesCleartextTraffic="true"
+        android:usesCleartextTraffic="false"
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:dataExtractionRules="@xml/data_extraction_rules"

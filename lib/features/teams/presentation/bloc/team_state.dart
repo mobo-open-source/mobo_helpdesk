@@ -170,7 +170,6 @@ class TeamState extends Equatable {
 
     bool? isWebsiteInstalled,
     bool? isProjectInstalled,
-
   }) {
     return TeamState(
       data: data ?? this.data,
@@ -179,7 +178,8 @@ class TeamState extends Equatable {
       isSaving: isSaving ?? this.isSaving,
       savingMessage: savingMessage ?? this.savingMessage,
       savingHint: savingHint ?? this.savingHint,
-      isModuleInstallLoading: isModuleInstallLoading ?? this.isModuleInstallLoading,
+      isModuleInstallLoading:
+          isModuleInstallLoading ?? this.isModuleInstallLoading,
       isSearchLoading: isSearchLoading ?? this.isSearchLoading,
       isPaginationLoading: isPaginationLoading ?? this.isPaginationLoading,
       total: total ?? this.total,
@@ -266,6 +266,6 @@ class TeamState extends Equatable {
     selectedInStages,
 
     isWebsiteInstalled,
-    isProjectInstalled
+    isProjectInstalled,
   ];
 }

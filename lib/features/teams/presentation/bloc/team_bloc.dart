@@ -150,7 +150,11 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
       // failed refresh would otherwise leave it as.
       if (e is Map<String, String>) {
         emit(
-          state.copyWith(isLoading: false, isPaginationLoading: false, error: e),
+          state.copyWith(
+            isLoading: false,
+            isPaginationLoading: false,
+            error: e,
+          ),
         );
       } else {
         emit(
@@ -243,9 +247,7 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
       await teamListUseCase.deleteTeam(event.teamId);
       await trackEvent();
 
-      add(
-        TeamsLoad(1, filters: state.selectedFilters, showSkeleton: true),
-      );
+      add(TeamsLoad(1, filters: state.selectedFilters, showSkeleton: true));
 
       emit(
         state.copyWith(message: "Team deleted successfully", isError: false),
@@ -275,9 +277,7 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
       await teamListUseCase.archiveTeam(event.teamId);
       await trackEvent();
 
-      add(
-        TeamsLoad(1, filters: state.selectedFilters, showSkeleton: true),
-      );
+      add(TeamsLoad(1, filters: state.selectedFilters, showSkeleton: true));
 
       emit(
         state.copyWith(message: "Team archived successfully", isError: false),
@@ -306,9 +306,7 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
       await teamListUseCase.unArchiveTeam(event.teamId);
       await trackEvent();
 
-      add(
-        TeamsLoad(1, filters: state.selectedFilters, showSkeleton: true),
-      );
+      add(TeamsLoad(1, filters: state.selectedFilters, showSkeleton: true));
 
       emit(
         state.copyWith(message: "Team unarchived successfully", isError: false),
@@ -346,7 +344,8 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
       // Deleted or no longer visible to this user: say so, instead of failing
       // further down on the first read of the missing record.
       if (data.isEmpty) throw Exception('This team could not be found.');
-      final companyId = (data.isNotEmpty &&
+      final companyId =
+          (data.isNotEmpty &&
               data.first['company_id'] is List &&
               (data.first['company_id'] as List).isNotEmpty)
           ? (data.first['company_id'] as List).first as int?
@@ -361,7 +360,9 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
         await safeApiCall(() => teamFormUseCase.loadWebsite()),
       );
       final resources = toMapList(
-        await safeApiCall(() => teamFormUseCase.loadResourceCalendar(companyId)),
+        await safeApiCall(
+          () => teamFormUseCase.loadResourceCalendar(companyId),
+        ),
       );
       final stages = toMapList(
         await safeApiCall(() => teamFormUseCase.loadStages()),
@@ -515,7 +516,9 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
         await safeApiCall(() => teamFormUseCase.loadWebsite()),
       );
       final resources = toMapList(
-        await safeApiCall(() => teamFormUseCase.loadResourceCalendar(event.companyId)),
+        await safeApiCall(
+          () => teamFormUseCase.loadResourceCalendar(event.companyId),
+        ),
       );
       final stages = toMapList(
         await safeApiCall(() => teamFormUseCase.loadStages()),

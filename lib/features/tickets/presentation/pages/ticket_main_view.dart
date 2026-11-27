@@ -23,6 +23,7 @@ import '../widgets/group_items.dart';
 import '../widgets/group_ticket.dart';
 import '../widgets/ticket_kanban_view.dart';
 import '../widgets/ticket_list_view.dart';
+import '../../../../core/storage/session_token_store.dart';
 
 /// A main view screen for displaying tickets in both **Kanban** and **List** formats.
 ///
@@ -89,8 +90,9 @@ class _TicketMainViewState extends State<TicketMainView> {
 
   Future<void> initialize() async {
     final prefs = await SharedPreferences.getInstance();
+    final storedSession = await SessionTokenStore.getActive();
     setState(() {
-      session = prefs.getString('sessionId');
+      session = storedSession;
       url = prefs.getString('url');
     });
   }

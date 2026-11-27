@@ -7,6 +7,7 @@ import '../navigation/navigation_keys.dart';
 import '../usecases/reset_session_usecase.dart';
 import '../utils/app_logger.dart';
 import '../widgets/snackbar.dart';
+import '../storage/session_token_store.dart';
 
 /// Thrown when the Odoo database behind a session has passed its expiration
 /// date (the one Odoo Enterprise shows as "This database has expired").
@@ -108,7 +109,7 @@ class DatabaseExpiry {
       if (!(prefs.getBool('isLoggedIn') ?? false)) return false;
       final expired = await isExpired(
         serverUrl: prefs.getString('url') ?? '',
-        sessionId: prefs.getString('sessionId') ?? '',
+        sessionId: await SessionTokenStore.getActive() ?? '',
       );
       if (!expired) return false;
 

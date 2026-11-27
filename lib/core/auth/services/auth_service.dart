@@ -25,7 +25,6 @@ import '../../session/models/session_model.dart';
 /// - Handles differences in `has_group` method signature between Odoo versions.
 /// - Returns a rich [SessionModel] containing all necessary session and user context.
 class AuthService {
-
   /// Parses the major version number from the Odoo server version string.
   ///
   /// Example: "18.0+e" → 18, "16.0" → 16
@@ -448,7 +447,7 @@ class AuthService {
           throw Exception("Access Denied");
         }
 
-        bool isSystem = isManager ;
+        bool isSystem = isManager;
 
         List<int> allowedCompanyIds = [];
         if (majorVersion >= 13) {
@@ -495,7 +494,6 @@ class AuthService {
           allowedCompanyIds: allowedCompanyIds,
         );
       } else {
-
         session = await client.authenticate(database, username, password);
         userId = session.userId;
 
@@ -528,39 +526,45 @@ class AuthService {
         bool isUser = false;
 
         if (majorVersion >= 18) {
-          isManager = await client.callKw({
-            'model': 'res.users',
-            'method': 'has_group',
-            'args': [session.userId, 'helpdesk.group_helpdesk_manager'],
-            'kwargs': {},
-          }) == true;
+          isManager =
+              await client.callKw({
+                'model': 'res.users',
+                'method': 'has_group',
+                'args': [session.userId, 'helpdesk.group_helpdesk_manager'],
+                'kwargs': {},
+              }) ==
+              true;
 
-          isUser = await client.callKw({
-            'model': 'res.users',
-            'method': 'has_group',
-            'args': [session.userId, 'helpdesk.group_helpdesk_user'],
-            'kwargs': {},
-          }) == true;
+          isUser =
+              await client.callKw({
+                'model': 'res.users',
+                'method': 'has_group',
+                'args': [session.userId, 'helpdesk.group_helpdesk_user'],
+                'kwargs': {},
+              }) ==
+              true;
         } else {
-          isManager = await client.callKw({
-            'model': 'res.users',
-            'method': 'has_group',
-            'args': ['helpdesk.group_helpdesk_manager'],
-            'kwargs': {},
-          }) == true;
+          isManager =
+              await client.callKw({
+                'model': 'res.users',
+                'method': 'has_group',
+                'args': ['helpdesk.group_helpdesk_manager'],
+                'kwargs': {},
+              }) ==
+              true;
 
-          isUser = await client.callKw({
-            'model': 'res.users',
-            'method': 'has_group',
-            'args': ['helpdesk.group_helpdesk_user'],
-            'kwargs': {},
-          }) == true;
+          isUser =
+              await client.callKw({
+                'model': 'res.users',
+                'method': 'has_group',
+                'args': ['helpdesk.group_helpdesk_user'],
+                'kwargs': {},
+              }) ==
+              true;
         }
 
         if (!isManager && !isUser) {
-          final helpdeskInstalled = await _isHelpdeskInstalledViaClient(
-            client,
-          );
+          final helpdeskInstalled = await _isHelpdeskInstalledViaClient(client);
           if (!helpdeskInstalled) {
             throw Exception("Module Missing");
           }
@@ -602,9 +606,7 @@ class AuthService {
           userLang: session.userLang,
           partnerId: session.partnerId,
           userTimezone: session.userTz,
-          companyId: userData.isNotEmpty
-              ? userData[0]['company_id'][0]
-              : null,
+          companyId: userData.isNotEmpty ? userData[0]['company_id'][0] : null,
           companyName: userData.isNotEmpty
               ? userData[0]['company_id'][1]
               : null,
@@ -612,7 +614,7 @@ class AuthService {
           version: majorVersion,
           allowedCompanyIds: allowedCompanyIds,
         );
-            }
+      }
     } catch (e) {
       rethrow;
     }

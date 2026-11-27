@@ -37,8 +37,7 @@ class OdooDomain {
   /// writes them; every other list stays a list.
   static String format(List<dynamic> domain) {
     final items = domain.map((item) {
-      final isLeaf =
-          item is List && item.length == 3 && item[1] is String;
+      final isLeaf = item is List && item.length == 3 && item[1] is String;
       return isLeaf ? _tuple(item) : _value(item);
     });
     return '[${items.join(', ')}]';

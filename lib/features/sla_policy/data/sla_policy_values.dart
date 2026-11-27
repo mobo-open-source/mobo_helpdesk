@@ -83,8 +83,11 @@ class SlaPolicyValues {
 
     if (current != null) {
       values.removeWhere(
-        (key, value) =>
-            OdooValues.unchanged(value, current[key], html: key == 'description'),
+        (key, value) => OdooValues.unchanged(
+          value,
+          current[key],
+          html: key == 'description',
+        ),
       );
     }
     return values;

@@ -13,11 +13,7 @@ class MoboToggle extends StatelessWidget {
   final bool value;
   final ValueChanged<bool>? onChanged;
 
-  const MoboToggle({
-    super.key,
-    required this.value,
-    this.onChanged,
-  });
+  const MoboToggle({super.key, required this.value, this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +35,7 @@ class MoboToggle extends StatelessWidget {
             color: value
                 ? primaryColor
                 : (isDark ? Colors.grey[900] : Colors.white),
-            border: value
-                ? null
-                : Border.all(color: primaryColor, width: 1.5),
+            border: value ? null : Border.all(color: primaryColor, width: 1.5),
           ),
           child: AnimatedAlign(
             duration: const Duration(milliseconds: 250),

@@ -64,9 +64,7 @@ class LoginRemoteDatasourceImpl extends LoginRemoteDatasource {
       final HttpClient httpClient = HttpClient()
         ..connectionTimeout = const Duration(seconds: 12)
         ..idleTimeout = const Duration(seconds: 10)
-        ..maxConnectionsPerHost = 5
-        ..badCertificateCallback =
-            (X509Certificate cert, String host, int port) => true;
+        ..maxConnectionsPerHost = 5;
 
       final String responseBody;
       try {

@@ -13,6 +13,8 @@ import '../../../login/presentation/pages/url_database_screen.dart';
 import '../../../onboarding/presentation/pages/get_started_screen.dart';
 import '../../../main/presentation/pages/main_layout_page.dart';
 import '../../domain/usecases/check_login_usecase.dart';
+import '../../../../core/storage/session_token_store.dart';
+import '../../../../core/security/biometric_lock.dart';
 
 /// Splash screen responsible for:
 /// - Checking biometric authentication (if enabled)
@@ -74,14 +76,11 @@ class _SplashScreenState extends State<SplashScreen> {
   /// - `false` if authentication fails or is unavailable
   Future<bool> _authenticateBiometrics() async {
     try {
-      final canCheck =
-          await _localAuth.canCheckBiometrics ||
-          await _localAuth.isDeviceSupported();
-
-      if (!canCheck) {
-        if (!mounted) return false;
-        CustomSnackBar.showError(context, 'Biometric not available');
-        return false;
+      // No usable biometric on this phone: the prompt could never succeed and
+      // the app would close on every launch. Drop the lock and open normally.
+      if (!await BiometricLock.isUsable(_localAuth)) {
+        await BiometricLock.disable();
+        return true;
       }
 
       final biometrics = await _localAuth.getAvailableBiometrics();
@@ -107,6 +106,10 @@ class _SplashScreenState extends State<SplashScreen> {
       }
       return ok;
     } catch (e) {
+      if (BiometricLock.isUnavailableError(e)) {
+        await BiometricLock.disable();
+        return true;
+      }
       if (!mounted) return false;
       CustomSnackBar.showError(
         context,
@@ -134,7 +137,7 @@ class _SplashScreenState extends State<SplashScreen> {
       final prefs = await SharedPreferences.getInstance();
       expired = await DatabaseExpiry.isExpired(
         serverUrl: prefs.getString('url') ?? '',
-        sessionId: prefs.getString('sessionId') ?? '',
+        sessionId: await SessionTokenStore.getActive() ?? '',
       );
       if (expired) {
         await ResetSessionUseCase().execute();

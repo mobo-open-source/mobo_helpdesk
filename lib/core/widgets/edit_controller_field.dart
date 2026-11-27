@@ -163,9 +163,7 @@ class EditControllerField extends StatelessWidget {
                               onTap: isAddress ? onTap : null,
                               onChanged: onChanged,
                               maxLines: (isAddress || isDescription) ? null : 1,
-                              minLines: isDescription
-                                  ? 5
-                                  : (isAddress ? 3 : 1),
+                              minLines: isDescription ? 5 : (isAddress ? 3 : 1),
                               style: AppTheme.fieldValueStyle(isDark),
                               decoration: InputDecoration(
                                 border: InputBorder.none,

@@ -13,6 +13,8 @@ import '../datasources/login_local_datasource.dart';
 import '../datasources/login_remote_datasource.dart';
 import '../datasources/reset_password_remote_datasource.dart';
 import '../models/database_model.dart';
+import '../../../../core/storage/session_token_store.dart';
+import '../../../../core/security/transport_policy.dart';
 
 /// Implementation of [LoginRepo] that handles authentication,
 /// database retrieval, session management, and TOTP verification.
@@ -92,7 +94,9 @@ class LoginRepoImpl implements LoginRepo {
     final session = await CompanySessionManager.getCurrentSession();
     if (session != null) {
       await local.saveUrlHistory(
-        protocol: url.startsWith('https') ? 'https://' : 'http://',
+        protocol: allowInsecureHttp && !url.startsWith('https')
+            ? 'http://'
+            : 'https://',
         url: url,
         database: database,
         username: username.trim(),
@@ -271,7 +275,7 @@ class LoginRepoImpl implements LoginRepo {
 
     await prefs.remove('logoutAction');
 
-    await prefs.setString('sessionId', sessionId);
+    await SessionTokenStore.setActive(sessionId);
     await prefs.setString('username', username);
     await prefs.setString('url', serverUrl);
     await prefs.setString('database', database);
