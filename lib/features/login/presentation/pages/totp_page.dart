@@ -686,10 +686,7 @@ class _TotpPageState extends State<TotpPage> {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
-        Text(
-          _baseUrl,
-          style: TextStyle(fontSize: 13, color: Colors.white54),
-        ),
+        Text(_baseUrl, style: TextStyle(fontSize: 13, color: Colors.white54)),
       ],
     );
   }

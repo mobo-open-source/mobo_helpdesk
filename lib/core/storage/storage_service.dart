@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../session/models/session_model.dart';
+import 'session_token_store.dart';
 
 /// Service responsible for persisting session data and login state using SharedPreferences.
 ///
@@ -21,7 +22,7 @@ class StorageService {
     await prefs.setString('userName', session.userName ?? '');
     await prefs.setString('userLogin', session.userLogin ?? '');
     await prefs.setInt('userId', session.userId ?? 0);
-    await prefs.setString('sessionId', session.sessionId);
+    await SessionTokenStore.setActive(session.sessionId);
     await prefs.setString('serverVersion', session.serverVersion ?? '');
     await prefs.setString('userLang', session.userLang ?? '');
     await prefs.setInt('partnerId', session.partnerId ?? 0);
@@ -90,9 +91,21 @@ class StorageService {
       account['allowed_companies'] = <Map<String, dynamic>>[];
     }
 
+    // The session id is a bearer credential: it goes to secure storage and is
+    // never written into the plaintext accounts list.
+    final sid = account.remove('sessionId');
+    if (sid != null && sid.toString().isNotEmpty) {
+      await SessionTokenStore.setAccount(
+        account['url'],
+        account['database'],
+        account['userLogin'],
+        sid.toString(),
+      );
+    }
+
     accounts.add(account);
 
-    await prefs.setString(_accountsKey, jsonEncode(accounts));
+    await prefs.setString(_accountsKey, _encodeAccounts(accounts));
   }
 
   /// Brings the signed-in account's stored display name and photo in line with
@@ -129,20 +142,39 @@ class StorageService {
         changed = true;
       }
     }
-    if (changed) await prefs.setString(_accountsKey, jsonEncode(accounts));
+    if (changed) await prefs.setString(_accountsKey, _encodeAccounts(accounts));
   }
+
+  /// Serializes the accounts list without session ids, which live only in
+  /// secure storage.
+  String _encodeAccounts(List<Map<String, dynamic>> accounts) => jsonEncode(
+    accounts
+        .map((a) => Map<String, dynamic>.of(a)..remove('sessionId'))
+        .toList(),
+  );
 
   Future<List<Map<String, dynamic>>> getAccounts() async {
     final prefs = await SharedPreferences.getInstance();
     final accountsJson = prefs.getString(_accountsKey);
     if (accountsJson == null) return [];
     final decoded = jsonDecode(accountsJson) as List<dynamic>;
-    return decoded.cast<Map<String, dynamic>>();
+    final accounts = decoded.cast<Map<String, dynamic>>();
+    for (final a in accounts) {
+      a['sessionId'] =
+          await SessionTokenStore.getAccount(
+            a['url'],
+            a['database'],
+            a['userLogin'],
+          ) ??
+          '';
+    }
+    return accounts;
   }
 
   Future<void> clearAccounts() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_accountsKey);
+    await SessionTokenStore.clearAccountTokens();
   }
 
   /// Removes a saved account matching the (url + database + userLogin) triple.
@@ -157,6 +189,7 @@ class StorageService {
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final accounts = await getAccounts();
+    await SessionTokenStore.removeAccount(url, database, userLogin);
 
     accounts.removeWhere(
       (a) =>
@@ -165,7 +198,7 @@ class StorageService {
           (a['database'] ?? '').toString() == database,
     );
 
-    await prefs.setString(_accountsKey, jsonEncode(accounts));
+    await prefs.setString(_accountsKey, _encodeAccounts(accounts));
   }
 
   Future<void> removeAccount({
@@ -177,6 +210,7 @@ class StorageService {
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final accounts = await getAccounts();
+    await SessionTokenStore.removeAccount(url, database, userLogin);
 
     accounts.removeWhere(
       (a) =>
@@ -187,6 +221,6 @@ class StorageService {
           a['database'] == database,
     );
 
-    await prefs.setString(_accountsKey, jsonEncode(accounts));
+    await prefs.setString(_accountsKey, _encodeAccounts(accounts));
   }
 }

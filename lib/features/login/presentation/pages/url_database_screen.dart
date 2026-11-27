@@ -12,6 +12,7 @@ import '../widgets/database_dropdown.dart';
 import '../widgets/error_message.dart';
 import '../widgets/url_input_field.dart';
 import 'credential_screen.dart';
+import '../../../../core/security/transport_policy.dart';
 
 /// Entry screen for collecting server URL and selecting a database.
 ///
@@ -229,8 +230,13 @@ class _UrlDatabaseViewState extends State<UrlDatabaseView> {
                                         String cleanUrl = state.url.trim();
                                         String protocolToUse = state.protocol;
 
+                                        if (!allowInsecureHttp) {
+                                          protocolToUse = 'https://';
+                                        }
                                         if (cleanUrl.startsWith('http://')) {
-                                          protocolToUse = 'http://';
+                                          if (allowInsecureHttp) {
+                                            protocolToUse = 'http://';
+                                          }
                                           cleanUrl = cleanUrl.replaceFirst(
                                             'http://',
                                             '',

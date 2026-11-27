@@ -38,10 +38,22 @@ class SkeletonShimmer extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final (base, highlight) = switch ((tone, isDark)) {
-      (SkeletonTone.slab, false) => (const Color(0xFFEEF0F4), const Color(0xFFF8F9FB)),
-      (SkeletonTone.ink, false) => (const Color(0xFFE1E4EA), const Color(0xFFEFF1F5)),
-      (SkeletonTone.slab, true) => (const Color(0xFF2B2E35), const Color(0xFF383C45)),
-      (SkeletonTone.ink, true) => (const Color(0xFF3A3E47), const Color(0xFF474C57)),
+      (SkeletonTone.slab, false) => (
+        const Color(0xFFEEF0F4),
+        const Color(0xFFF8F9FB),
+      ),
+      (SkeletonTone.ink, false) => (
+        const Color(0xFFE1E4EA),
+        const Color(0xFFEFF1F5),
+      ),
+      (SkeletonTone.slab, true) => (
+        const Color(0xFF2B2E35),
+        const Color(0xFF383C45),
+      ),
+      (SkeletonTone.ink, true) => (
+        const Color(0xFF3A3E47),
+        const Color(0xFF474C57),
+      ),
     };
 
     return Shimmer.fromColors(
@@ -103,7 +115,10 @@ class SkeletonCircle extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+      ),
     );
   }
 }
@@ -227,7 +242,9 @@ class _KanbanColumnSkeleton extends StatelessWidget {
           children: [
             const Padding(
               padding: EdgeInsets.all(8),
-              child: SkeletonShimmer(child: SkeletonBar(width: 120, height: 16)),
+              child: SkeletonShimmer(
+                child: SkeletonBar(width: 120, height: 16),
+              ),
             ),
             const SizedBox(height: 4),
             for (var card = 0; card < cards; card++)

@@ -126,7 +126,9 @@ class _Criteria {
   factory _Criteria.parse(dynamic stored) {
     final text = stored is String ? stored : null;
     final domain = OdooDomain.tryParse(text);
-    final expressions = domain == null ? null : OdooDomain.splitTopLevel(domain);
+    final expressions = domain == null
+        ? null
+        : OdooDomain.splitTopLevel(domain);
     if (expressions == null) return _Criteria._(unreadable: true);
 
     int? priority;

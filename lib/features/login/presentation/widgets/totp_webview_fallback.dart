@@ -159,15 +159,10 @@ class _TotpWebViewFallbackState extends State<TotpWebViewFallback> {
               useHybridComposition: true,
               allowContentAccess: true,
               allowFileAccess: true,
-              mixedContentMode: MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
+              mixedContentMode: MixedContentMode.MIXED_CONTENT_NEVER_ALLOW,
               disableDefaultErrorPage: true,
             ),
             onWebViewCreated: (controller) => _webController = controller,
-            onReceivedServerTrustAuthRequest: (controller, challenge) async {
-              return ServerTrustAuthResponse(
-                action: ServerTrustAuthResponseAction.PROCEED,
-              );
-            },
             onReceivedError: (controller, request, error) {
               // Only the page itself: a failed image or stylesheet says
               // nothing about whether the login can be completed.

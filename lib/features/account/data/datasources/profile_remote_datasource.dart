@@ -279,7 +279,8 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
       final prefs0 = await SharedPreferences.getInstance();
       final major =
           int.tryParse(
-            RegExp(r'\d+').firstMatch(prefs0.getString('serverVersion') ?? '')
+            RegExp(r'\d+')
+                    .firstMatch(prefs0.getString('serverVersion') ?? '')
                     ?.group(0) ??
                 '',
           ) ??

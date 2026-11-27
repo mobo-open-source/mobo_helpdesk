@@ -5,7 +5,6 @@ import '../../session/company_session_manager.dart';
 /// This is used to enable/disable features in the app based on the modules
 /// installed on the backend (e.g., `hr`, `project`, `helpdesk`, `account`, etc.).
 abstract class ModuleCheckRemoteDataSource {
-
   /// Checks if a specific Odoo module is installed and active.
   ///
   /// Returns `true` if the module with the given [moduleName] exists and its

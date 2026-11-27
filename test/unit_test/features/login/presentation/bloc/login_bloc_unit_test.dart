@@ -44,11 +44,37 @@ void main() {
       loginUseCase: mockLoginUseCase,
       resetPasswordUseCase: mockResetPasswordUseCase,
       completeTotpLoginUseCase: mockCompleteTotpLoginUseCase,
+      // The certificate check opens a real connection; tests do not.
+      serverTrustCheck: (_) async => true,
     );
   });
 
   setUpAll(() {
     SharedPreferences.setMockInitialValues({});
+  });
+
+  group('LoginBloc - Untrusted certificate', () {
+    blocTest<LoginBloc, LoginState>(
+      'does not fetch databases and reports an error when the user declines',
+      build: () => LoginBloc(
+        fetchDatabasesUseCase: mockFetchDatabaseUseCase,
+        loadUrlHistoryUseCase: mockLoadUrlHistoryUseCase,
+        loginUseCase: mockLoginUseCase,
+        resetPasswordUseCase: mockResetPasswordUseCase,
+        completeTotpLoginUseCase: mockCompleteTotpLoginUseCase,
+        serverTrustCheck: (_) async => false,
+      ),
+      act: (bloc) => bloc.add(const FetchDatabases('https://self-signed.test')),
+      expect: () => [
+        isA<LoginState>().having((s) => s.isLoading, 'isLoading', true),
+        isA<LoginState>()
+            .having((s) => s.isLoading, 'isLoading', false)
+            .having((s) => s.urlError, 'urlError', isNotEmpty),
+      ],
+      verify: (_) {
+        verifyNever(() => mockFetchDatabaseUseCase.fetchDatabases(any()));
+      },
+    );
   });
 
   group('LoginBloc - Fetch Databases', () {

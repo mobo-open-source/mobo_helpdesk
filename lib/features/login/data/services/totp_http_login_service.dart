@@ -50,13 +50,7 @@ class OdooTotpHttpClient {
     // Keeps the connection open between the handshake and the code
     // submission, so submitting a code costs one round trip and no new TLS
     // negotiation.
-    ..idleTimeout = const Duration(seconds: 60)
-    // Self-signed certificates are accepted for the same reason the rest of
-    // this app accepts them (the shared `ioClient` in `self_signed.dart`,
-    // and the WebView's own `ServerTrustAuthResponseAction.PROCEED`):
-    // on-premise Odoo servers are routinely deployed behind one, and
-    // refusing here would push every such server onto the slow fallback.
-    ..badCertificateCallback = (cert, host, port) => true;
+    ..idleTimeout = const Duration(seconds: 60);
 
   /// The cookie jar for this flow only. It is deliberately *not* shared with
   /// the rest of the app, and deliberately never seeded from the system
@@ -554,8 +548,7 @@ class OdooTotpHttpClient {
     Duration timeout = const Duration(seconds: 20),
   }) async {
     final client = HttpClient()
-      ..connectionTimeout = const Duration(seconds: 15)
-      ..badCertificateCallback = (cert, host, port) => true;
+      ..connectionTimeout = const Duration(seconds: 15);
     try {
       final request = await client.postUrl(
         _parseBase(serverUrl).resolve('web/session/get_session_info'),

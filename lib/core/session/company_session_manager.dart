@@ -9,6 +9,7 @@ import '../storage/password_security.dart';
 import '../storage/storage_service.dart';
 import 'database_expiry.dart';
 import 'models/session_model.dart';
+import '../storage/session_token_store.dart';
 
 /// Central manager for handling Odoo sessions and company context across the application.
 ///
@@ -63,7 +64,7 @@ class CompanySessionManager {
     final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
     if (!isLoggedIn) return null;
 
-    final String? sessionId = prefs.getString('sessionId');
+    final String? sessionId = await SessionTokenStore.getActive();
     final int? userId = prefs.getInt('userId');
     final String? url = prefs.getString('url');
 
@@ -128,7 +129,7 @@ class CompanySessionManager {
     await prefs.setBool('isLoggedIn', true);
     await prefs.setString('url', url);
     await prefs.setString('database', database);
-    await prefs.setString('sessionId', sessionId);
+    await SessionTokenStore.setActive(sessionId);
 
     await prefs.setInt('userId', sessionInfo['uid']);
     await prefs.setString('userName', sessionInfo['name']);
@@ -241,7 +242,7 @@ class CompanySessionManager {
 
     final prefs = await SharedPreferences.getInstance();
     final db = prefs.getString('database') ?? '';
-    final sessionId = prefs.getString('sessionId') ?? '';
+    final sessionId = await SessionTokenStore.getActive() ?? '';
     final serverVersion = prefs.getString('serverVersion') ?? '';
     final userLang = prefs.getString('userLang') ?? '';
     final allowedCompaniesStringList =
@@ -315,7 +316,7 @@ class CompanySessionManager {
 
       final prefs = await SharedPreferences.getInstance();
       final db = prefs.getString('database') ?? '';
-      final sessionId = prefs.getString('sessionId') ?? '';
+      final sessionId = await SessionTokenStore.getActive() ?? '';
       final serverVersion = prefs.getString('serverVersion') ?? '';
       final userLang = prefs.getString('userLang') ?? '';
       final allowedCompaniesStringList =
@@ -634,7 +635,7 @@ class CompanySessionManager {
 
       final prefs = await SharedPreferences.getInstance();
       final db = prefs.getString('database') ?? '';
-      final sessionId = prefs.getString('sessionId') ?? '';
+      final sessionId = await SessionTokenStore.getActive() ?? '';
       final serverVersion = prefs.getString('serverVersion') ?? '';
       final userLang = prefs.getString('userLang') ?? '';
       final allowedCompaniesStringList =

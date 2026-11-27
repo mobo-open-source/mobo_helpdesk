@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,6 +14,8 @@ import 'features/main/presentation/bloc/main_layout_bloc.dart';
 import 'features/sla_policy/presentation/bloc/sla_policy_bloc.dart';
 import 'features/teams/presentation/bloc/team_bloc.dart';
 import 'features/tickets/presentation/bloc/ticket_bloc.dart';
+import 'core/storage/session_token_store.dart';
+import 'core/security/trusted_certificates.dart';
 
 /// The entry point of the Flutter application.
 ///
@@ -46,6 +49,9 @@ Future<void> main() async {
   ErrorWidget.builder = (FlutterErrorDetails details) =>
       const SizedBox.shrink();
 
+  await TrustedCertificates.load();
+  HttpOverrides.global = TrustedCertificateOverrides();
+  await SessionTokenStore.migrateFromPlaintext();
   await di.init();
 
   runApp(

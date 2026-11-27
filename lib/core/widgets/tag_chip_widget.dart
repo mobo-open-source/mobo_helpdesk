@@ -74,13 +74,12 @@ Widget buildChips(List<Map<String, dynamic>> tags, bool isDark) {
     children: tags.map((tag) {
       final name = tag['name'] ?? tag['display_name'] ?? '';
 
-
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 4),
         decoration: BoxDecoration(
           color: AppColors.primary.withAlpha(20),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.primary, width: 1)
+          border: Border.all(color: AppColors.primary, width: 1),
         ),
         child: Text(
           name,
@@ -94,6 +93,7 @@ Widget buildChips(List<Map<String, dynamic>> tags, bool isDark) {
     }).toList(),
   );
 }
+
 Widget buildText(List<Map<String, dynamic>> tags, bool isDark) {
   if (tags.isEmpty) {
     return Text(
@@ -111,13 +111,10 @@ Widget buildText(List<Map<String, dynamic>> tags, bool isDark) {
     children: tags.map((tag) {
       final name = tag['name'] ?? tag['display_name'] ?? '';
       return Container(
-        padding: const EdgeInsets.only(left: 10,),
+        padding: const EdgeInsets.only(left: 10),
         child: Text(
           name,
-          style: TextStyle(
-            fontWeight: FontWeight.normal,
-            fontSize: 14,
-          ),
+          style: TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
           textAlign: TextAlign.end,
         ),
       );

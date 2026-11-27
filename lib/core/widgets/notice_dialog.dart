@@ -154,10 +154,7 @@ class NoticeDialog extends StatelessWidget {
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               buttonText,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
           ),
         ),

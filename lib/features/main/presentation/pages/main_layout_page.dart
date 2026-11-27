@@ -32,6 +32,7 @@ import '../../../teams/presentation/pages/team_list.dart';
 import '../../../tickets/presentation/bloc/ticket_bloc.dart';
 import '../../../tickets/presentation/pages/ticket_main_view.dart';
 import '../bloc/main_layout_bloc.dart';
+import '../../../../core/security/biometric_lock.dart';
 
 /// Main entry screen of the application after successful authentication.
 ///
@@ -133,10 +134,25 @@ class _MainLayoutPageState extends State<MainLayoutPage>
   bool _authenticating = false;
   final ValueNotifier<bool> _locked = ValueNotifier(false);
 
+  /// Plain cover shown while the app is not in the foreground, so the recent
+  /// apps thumbnail does not expose tickets and customer data. Only used when
+  /// the biometric lock is on.
+  final ValueNotifier<bool> _hidden = ValueNotifier(false);
+
+  bool get _biometricOn =>
+      sl<SharedPreferences>().getBool('biometricEnabled') ?? false;
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // The biometric prompt itself pauses and resumes the app.
     if (_authenticating) return;
+
+    if (_biometricOn &&
+        (state == AppLifecycleState.inactive ||
+            state == AppLifecycleState.hidden ||
+            state == AppLifecycleState.paused)) {
+      _hidden.value = true;
+    }
 
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden) {
@@ -145,7 +161,10 @@ class _MainLayoutPageState extends State<MainLayoutPage>
       final since = _backgroundedAt;
       _backgroundedAt = null;
       DatabaseExpiry.enforceOnStoredSession();
-      if (since == null) return;
+      if (since == null) {
+        _hidden.value = false;
+        return;
+      }
       _onReturned(DateTime.now().difference(since));
     }
   }
@@ -157,10 +176,12 @@ class _MainLayoutPageState extends State<MainLayoutPage>
     if (away >= _relockAfter && (prefs.getBool('biometricEnabled') ?? false)) {
       // Covered at once so nothing shows while the prompt is up.
       _locked.value = true;
+      _hidden.value = false;
       await _unlock();
       if (!_locked.value) _refreshIfStale(away);
       return;
     }
+    _hidden.value = false;
     _refreshIfStale(away);
   }
 
@@ -170,6 +191,14 @@ class _MainLayoutPageState extends State<MainLayoutPage>
     if (_authenticating) return;
     _authenticating = true;
     try {
+      // The phone can no longer provide a biometric: the prompt could never
+      // succeed, so lift the cover and turn the lock off instead of trapping
+      // the user behind it.
+      if (!await BiometricLock.isUsable(_localAuth)) {
+        await BiometricLock.disable();
+        if (mounted) _locked.value = false;
+        return;
+      }
       final ok = await _localAuth.authenticate(
         localizedReason: 'Authenticate to continue',
         options: const AuthenticationOptions(
@@ -178,8 +207,12 @@ class _MainLayoutPageState extends State<MainLayoutPage>
         ),
       );
       if (ok && mounted) _locked.value = false;
-    } catch (_) {
-      // Stays locked; the cover has a retry button.
+    } catch (e) {
+      if (BiometricLock.isUnavailableError(e)) {
+        await BiometricLock.disable();
+        if (mounted) _locked.value = false;
+      }
+      // Otherwise stays locked; the cover has a retry button.
     } finally {
       _authenticating = false;
     }
@@ -218,6 +251,7 @@ class _MainLayoutPageState extends State<MainLayoutPage>
     companySub.cancel();
     profileSub.cancel();
     _locked.dispose();
+    _hidden.dispose();
     super.dispose();
   }
 
@@ -425,10 +459,21 @@ class _MainLayoutPageState extends State<MainLayoutPage>
       },
     );
 
-    return ValueListenableBuilder<bool>(
-      valueListenable: _locked,
-      builder: (context, locked, _) => Stack(
-        children: [Positioned.fill(child: content), if (locked) _lockCover(context)],
+    return ListenableBuilder(
+      listenable: Listenable.merge([_locked, _hidden]),
+      builder: (context, _) => Stack(
+        children: [
+          Positioned.fill(child: content),
+          if (_hidden.value && !_locked.value)
+            Positioned.fill(
+              child: ColoredBox(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.black
+                    : Colors.white,
+              ),
+            ),
+          if (_locked.value) _lockCover(context),
+        ],
       ),
     );
   }

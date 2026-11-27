@@ -570,7 +570,11 @@ class TeamFormRemoteDatasourceImpl implements TeamFormRemoteDatasource {
         'method': 'search_count',
         'args': [
           [
-            ['state', 'in', ['to install', 'to upgrade', 'to remove']],
+            [
+              'state',
+              'in',
+              ['to install', 'to upgrade', 'to remove'],
+            ],
           ],
         ],
         'kwargs': {},

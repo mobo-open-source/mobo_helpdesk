@@ -16,6 +16,7 @@ Color odooColor(int index) {
 
   return odooColors[index % odooColors.length];
 }
+
 Color getTicketStatusColor(String status) {
   switch (status.toLowerCase()) {
     case 'new':

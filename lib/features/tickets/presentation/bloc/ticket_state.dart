@@ -239,7 +239,8 @@ class TicketState extends Equatable {
 
       selectedOpportunityCustomer:
           selectedOpportunityCustomer ?? this.selectedOpportunityCustomer,
-      selectedOpportunityPartner: identical(selectedOpportunityPartner, _noChange)
+      selectedOpportunityPartner:
+          identical(selectedOpportunityPartner, _noChange)
           ? this.selectedOpportunityPartner
           : selectedOpportunityPartner as Map<String, dynamic>?,
       selectedOpportunityTeam: identical(selectedOpportunityTeam, _noChange)

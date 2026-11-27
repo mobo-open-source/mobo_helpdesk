@@ -17,6 +17,9 @@ import '../../domain/usecases/reset_password_usecase.dart';
 import '../../domain/usecases/complete_totp_login_usecase.dart';
 import '../utils/login_error_formatter.dart';
 import '../../../../core/utils/odoo_field_resolver.dart';
+import '../../../../core/storage/session_token_store.dart';
+import '../../../../core/security/certificate_trust_prompt.dart';
+import '../../../../core/security/transport_policy.dart';
 
 part 'login_event.dart';
 
@@ -54,6 +57,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final ResetPasswordUseCase resetPasswordUseCase;
   final CompleteTotpLoginUseCase completeTotpLoginUseCase;
 
+  /// Decides whether the server's certificate may be used (asking the user to
+  /// approve a self-signed one). Injectable so tests need no network or UI.
+  final Future<bool> Function(String fullUrl) serverTrustCheck;
+
   Timer? _debounce;
 
   LoginBloc({
@@ -62,6 +69,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     required this.loginUseCase,
     required this.resetPasswordUseCase,
     required this.completeTotpLoginUseCase,
+    this.serverTrustCheck = ensureServerTrusted,
   }) : super(const LoginState()) {
     on<ProtocolChanged>(_onProtocolChanged);
     on<UrlChanged>(_onUrlChanged);
@@ -82,7 +90,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   ) async {
     emit(
       state.copyWith(
-        protocol: event.protocol,
+        // http:// is accepted in debug builds only (see transport_policy.dart).
+        protocol: allowInsecureHttp ? event.protocol : 'https://',
         databases: [],
         selectedDatabase: null,
         urlError: "",
@@ -119,6 +128,21 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     }
 
     final String domain = extractDomain(raw);
+
+    // Credentials and session cookies must never travel over plain HTTP.
+    if (!allowInsecureHttp && raw.toLowerCase().startsWith('http://')) {
+      emit(
+        state.copyWith(
+          protocol: 'https://',
+          url: domain,
+          databases: [],
+          selectedDatabase: null,
+          urlError: 'Only secure servers (https://) are supported.',
+          isLoading: false,
+        ),
+      );
+      return;
+    }
 
     emit(
       state.copyWith(
@@ -176,6 +200,18 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     );
 
     try {
+      // Self-signed / private-CA servers need the user's explicit approval of
+      // their exact certificate before any credentials are sent.
+      if (!await serverTrustCheck(event.fullUrl)) {
+        emit(
+          state.copyWith(
+            urlError: 'The server certificate was not trusted.',
+            isLoading: false,
+          ),
+        );
+        return;
+      }
+
       final List<DatabaseEntity> result = await fetchDatabasesUseCase
           .fetchDatabases(event.fullUrl);
 
@@ -307,7 +343,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
               await restoreString('url', event.previousUrl);
               await restoreString('database', event.previousDatabase);
-              await prefs.setString('sessionId', prev.sessionId);
+              await SessionTokenStore.setActive(prev.sessionId);
               await restoreString('userName', prev.userName);
               await restoreString('userLogin', prev.userLogin);
               await restoreInt('userId', prev.userId);

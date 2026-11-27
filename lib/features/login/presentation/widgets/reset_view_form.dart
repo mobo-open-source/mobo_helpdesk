@@ -65,8 +65,7 @@ class _ResetViewFormState extends State<ResetViewForm> {
     super.dispose();
   }
 
-  String? get _errorMessage =>
-      _errorDismissed ? null : widget.errorMessage;
+  String? get _errorMessage => _errorDismissed ? null : widget.errorMessage;
 
   Future<void> _sendResetEmail() async {
     FocusScope.of(context).unfocus();

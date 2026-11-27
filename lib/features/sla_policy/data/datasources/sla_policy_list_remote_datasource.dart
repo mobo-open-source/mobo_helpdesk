@@ -157,7 +157,11 @@ class SlaPolicyListRemoteDatasourceImpl
         'exclude_stage_ids',
         if (criteriaAsDomain)
           SlaCriteria.domainField
-        else ...['priority', 'tag_ids', 'partner_ids'],
+        else ...[
+          'priority',
+          'tag_ids',
+          'partner_ids',
+        ],
       ];
       if (version <= 17) {
         fields.add('ticket_type_ids');

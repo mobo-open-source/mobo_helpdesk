@@ -121,12 +121,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                     horizontal: isSmall ? 24 : 40,
                     vertical: isSmall ? 20 : 40,
                   ),
-                  child: Column(
-                    children: [
-                      const Spacer(),
-                      _buildContent(),
-                    ],
-                  ),
+                  child: Column(children: [const Spacer(), _buildContent()]),
                 ),
               ),
             ),
@@ -151,7 +146,11 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
             height: 1.3,
             letterSpacing: -0.5,
             shadows: const [
-              Shadow(offset: Offset(0, 2), blurRadius: 4, color: Colors.black54),
+              Shadow(
+                offset: Offset(0, 2),
+                blurRadius: 4,
+                color: Colors.black54,
+              ),
             ],
           ),
         ),
@@ -164,7 +163,11 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
             color: Colors.white.withValues(alpha: 0.8),
             height: 1.6,
             shadows: const [
-              Shadow(offset: Offset(0, 1), blurRadius: 2, color: Colors.black54),
+              Shadow(
+                offset: Offset(0, 1),
+                blurRadius: 2,
+                color: Colors.black54,
+              ),
             ],
           ),
         ),

@@ -96,12 +96,9 @@ class _CustomKanbanBoardState<T extends Object>
 
   void _syncColumnScrollers() {
     final newIds = widget.stages.map((s) => s['id'] as int).toSet();
-    _colScrolls.keys
-        .where((id) => !newIds.contains(id))
-        .toList()
-        .forEach((id) {
-          _colScrolls.remove(id)?.dispose();
-        });
+    _colScrolls.keys.where((id) => !newIds.contains(id)).toList().forEach((id) {
+      _colScrolls.remove(id)?.dispose();
+    });
     for (final id in newIds) {
       _colScrolls.putIfAbsent(id, ScrollController.new);
     }
@@ -122,8 +119,10 @@ class _CustomKanbanBoardState<T extends Object>
       }
       if (delta != 0) {
         _hScroll.jumpTo(
-          (_hScroll.offset + delta)
-              .clamp(0.0, _hScroll.position.maxScrollExtent),
+          (_hScroll.offset + delta).clamp(
+            0.0,
+            _hScroll.position.maxScrollExtent,
+          ),
         );
       }
     });
@@ -232,34 +231,35 @@ class _CustomKanbanBoardState<T extends Object>
               : MediaQuery.of(context).size.height - 30;
 
           return ScrollConfiguration(
-          behavior: ScrollConfiguration.of(context).copyWith(
-            dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
-            },
-          ),
-          child: SingleChildScrollView(
-            controller: _hScroll,
-            scrollDirection: Axis.horizontal,
-            physics: const ClampingScrollPhysics(),
-            dragStartBehavior: DragStartBehavior.down,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: widget.stages.map((s) {
-                final id = s['id'] as int;
-                final name = s['name'] as String;
-                return _buildColumn(id, name, _grouped[id] ?? [], maxH);
-              }).toList(),
+            behavior: ScrollConfiguration.of(context).copyWith(
+              dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},
             ),
-          ),
-        );
-      },
+            child: SingleChildScrollView(
+              controller: _hScroll,
+              scrollDirection: Axis.horizontal,
+              physics: const ClampingScrollPhysics(),
+              dragStartBehavior: DragStartBehavior.down,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: widget.stages.map((s) {
+                  final id = s['id'] as int;
+                  final name = s['name'] as String;
+                  return _buildColumn(id, name, _grouped[id] ?? [], maxH);
+                }).toList(),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
 
   Widget _buildColumn(
-      int stageId, String stageName, List<T> items, double maxH) {
+    int stageId,
+    String stageName,
+    List<T> items,
+    double maxH,
+  ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final colScroll = _colScrolls[stageId]!;
     final colKeys = _keys[stageId] ?? [];
@@ -291,7 +291,10 @@ class _CustomKanbanBoardState<T extends Object>
               ? const SizedBox.shrink()
               : Padding(
                   key: itemIndex < colKeys.length ? colKeys[itemIndex] : null,
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   child: LongPressDraggable<T>(
                     data: item,
                     hapticFeedbackOnStart: true,

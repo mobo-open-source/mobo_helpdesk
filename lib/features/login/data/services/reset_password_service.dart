@@ -552,7 +552,6 @@ class ResetPasswordService {
         referer: '$loginUrl?redirect=/web/login$dbQuery',
       );
 
-
       if (resetGet.statusCode != 200) {
         return {
           'success': false,
@@ -569,7 +568,6 @@ class ResetPasswordService {
 
       formData['login'] = login;
       formData['redirect'] = '/web/login';
-
 
       final postHeaders = {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -604,7 +602,6 @@ class ResetPasswordService {
       } finally {
         postClient.close();
       }
-
 
       if (postResponse.statusCode == 302 || postResponse.statusCode == 303) {
         return {
@@ -710,7 +707,6 @@ class ResetPasswordService {
       if (setCookie != null) {
         cookies.addAll(_parseCookies(setCookie));
       }
-
 
       if (response.statusCode < 300 || response.statusCode >= 400) {
         return response;

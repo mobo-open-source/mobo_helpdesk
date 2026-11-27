@@ -5,6 +5,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 
 import '../bloc/login_bloc.dart';
+import '../../../../core/security/transport_policy.dart';
 
 /// A URL input field with autocomplete support for server addresses.
 ///
@@ -116,7 +117,7 @@ class UrlInputField extends StatelessWidget {
                     DropdownButtonHideUnderline(
                       child: DropdownButton2<String>(
                         value: state.protocol,
-                        items: ['http://', 'https://']
+                        items: [if (allowInsecureHttp) 'http://', 'https://']
                             .map(
                               (p) => DropdownMenuItem(
                                 value: p,
